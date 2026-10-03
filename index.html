@@ -1083,218 +1083,274 @@
 
         const byId = (id) => document.getElementById(id);
         const RM = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+
+        /* ===================== AUDIO (fixed for mobile browsers) ===================== */
         let AC = null;
+        let MASTER = null;
+        let silentEl = null;
 
-      function getAudio() {
-    if (AC) return AC;
+        function getAudio() {
+            if (AC) return AC;
 
-    const Ctor = window.AudioContext || window.webkitAudioContext;
-    if (!Ctor) return null;
+            const Ctor = window.AudioContext || window.webkitAudioContext;
+            if (!Ctor) return null;
 
-    try {
-        AC = new Ctor();
-    } catch (e) {
-        AC = null;
-    }
+            try {
+                AC = new Ctor();
 
-    return AC;
-}
+                // Master chain: gentle compressor keeps the sound clear but never harsh
+                const comp = AC.createDynamicsCompressor();
+                comp.threshold.value = -14;
+                comp.knee.value = 14;
+                comp.ratio.value = 4;
+                comp.attack.value = 0.004;
+                comp.release.value = 0.2;
 
-function withAudio(fn) {
-    const a = getAudio();
-    if (!a) return;
+                MASTER = AC.createGain();
+                MASTER.gain.value = 1;
+                MASTER.connect(comp);
+                comp.connect(AC.destination);
+            } catch (e) {
+                AC = null;
+                MASTER = null;
+            }
 
-    if (a.state === 'running') {
-        fn();
-        return;
-    }
-
-    try {
-        a.resume()
-            .then(() => {
-                if (a.state === 'running') {
-                    fn();
-                }
-            })
-            .catch(() => {});
-    } catch (e) {}
-}
-
-function tone(f0, f1, dur, peak, type, delay) {
-    const a = AC;
-
-    if (!a || a.state !== 'running') return;
-
-    try {
-        const t = a.currentTime + (delay || 0) + 0.01;
-
-        const o = a.createOscillator();
-        const g = a.createGain();
-
-        o.type = type || 'sine';
-
-        // Frequency sweep
-        o.frequency.setValueAtTime(f0, t);
-        o.frequency.exponentialRampToValueAtTime(
-            Math.max(f1, 1),
-            t + dur
-        );
-
-        // Smooth attack
-        g.gain.setValueAtTime(0.0001, t);
-
-        g.gain.linearRampToValueAtTime(
-            peak,
-            t + Math.min(0.025, dur * 0.15)
-        );
-
-        // Smooth decay
-        g.gain.exponentialRampToValueAtTime(
-            0.0001,
-            t + dur
-        );
-
-        o.connect(g);
-        g.connect(a.destination);
-
-        o.start(t);
-        o.stop(t + dur + 0.03);
-
-    } catch (e) {}
-}
-
-
-const SFX = {
-
-   thump() {
-    // Main heartbeat body
-    tone(
-        75,
-        38,
-        0.24,
-        0.38,
-        'sine'
-    );
-
-    // Upper layer so the heartbeat remains audible
-    // on small phone speakers
-    tone(
-        145,
-        65,
-        0.13,
-        0.075,
-        'sine',
-        0.005
-    );
-},
-
-    orb() {
-        tone(
-            520,
-            780,
-            0.5,
-            0.04
-        );
-
-        tone(
-            260,
-            390,
-            0.6,
-            0.03,
-            'sine',
-            0.05
-        );
-    },
-
-    click() {
-        tone(
-            1400,
-            700,
-            0.04,
-            0.04,
-            'triangle'
-        );
-
-        tone(
-            2100,
-            1500,
-            0.03,
-            0.025,
-            'sine',
-            0.04
-        );
-    },
-
-    confirm() {
-        tone(
-            660,
-            660,
-            0.25,
-            0.05
-        );
-
-        tone(
-            880,
-            880,
-            0.4,
-            0.05,
-            'sine',
-            0.12
-        );
-
-        tone(
-            1320,
-            1320,
-            0.5,
-            0.035,
-            'sine',
-            0.26
-        );
-    },
-
-    reveal() {
-        tone(
-            523,
-            523,
-            0.9,
-            0.04
-        );
-
-        tone(
-            784,
-            784,
-            1.2,
-            0.035,
-            'sine',
-            0.12
-        );
-
-        tone(
-            1046,
-            1046,
-            1.5,
-            0.025,
-            'sine',
-            0.24
-        );
-    }
-};
-
-
-function vibe(p) {
-    try {
-        if (
-            'vibrate' in navigator &&
-            typeof navigator.vibrate === 'function' &&
-            (
-                !navigator.userActivation ||
-                navigator.userActivation.hasBeenActive
-            )
-        ) {
-            navigator.vibrate(p);
+            return AC;
         }
-    } catch (e) {}
-}
+
+        // iOS Safari: playing a (silent) HTML audio element switches the page to the
+        // "playback" audio session, so Web Audio is heard even with the silent switch on.
+        function unlockIOSAudio() {
+            if (silentEl) return;
+            try {
+                const sr = 8000, n = 800;
+                const buf = new ArrayBuffer(44 + n * 2);
+                const v = new DataView(buf);
+                const w = (o, s) => { for (let i = 0; i < s.length; i++) v.setUint8(o + i, s.charCodeAt(i)); };
+                w(0, 'RIFF'); v.setUint32(4, 36 + n * 2, true); w(8, 'WAVE'); w(12, 'fmt ');
+                v.setUint32(16, 16, true); v.setUint16(20, 1, true); v.setUint16(22, 1, true);
+                v.setUint32(24, sr, true); v.setUint32(28, sr * 2, true); v.setUint16(32, 2, true); v.setUint16(34, 16, true);
+                w(36, 'data'); v.setUint32(40, n * 2, true);
+                const url = URL.createObjectURL(new Blob([buf], { type: 'audio/wav' }));
+                silentEl = new Audio(url);
+                silentEl.loop = true;
+                silentEl.setAttribute('playsinline', '');
+                const p = silentEl.play();
+                if (p && p.catch) p.catch(() => {});
+            } catch (e) {}
+        }
+
+        // Must be called from inside a real user gesture (tap / click / key)
+        function unlockAudio() {
+            const a = getAudio();
+            if (!a) return;
+            unlockIOSAudio();
+            try {
+                if (a.state !== 'running') a.resume().catch(() => {});
+            } catch (e) {}
+            try {
+                const b = a.createBuffer(1, 1, 22050);
+                const s = a.createBufferSource();
+                s.buffer = b;
+                s.connect(a.destination);
+                s.start(0);
+            } catch (e) {}
+        }
+
+        function withAudio(fn) {
+            const a = getAudio();
+            if (!a) return;
+
+            if (a.state === 'running') {
+                fn();
+                return;
+            }
+
+            try {
+                a.resume()
+                    .then(() => {
+                        if (a.state === 'running') {
+                            fn();
+                        }
+                    })
+                    .catch(() => {});
+            } catch (e) {}
+        }
+
+        document.addEventListener('visibilitychange', () => {
+            if (!document.hidden && AC && AC.state !== 'running') {
+                try { AC.resume().catch(() => {}); } catch (e) {}
+            }
+        });
+
+        function tone(f0, f1, dur, peak, type, delay) {
+            const a = AC;
+
+            if (!a || a.state !== 'running') return;
+
+            try {
+                const t = a.currentTime + (delay || 0) + 0.01;
+
+                const o = a.createOscillator();
+                const g = a.createGain();
+
+                o.type = type || 'sine';
+
+                // Frequency sweep
+                o.frequency.setValueAtTime(f0, t);
+                o.frequency.exponentialRampToValueAtTime(
+                    Math.max(f1, 1),
+                    t + dur
+                );
+
+                // Smooth attack
+                g.gain.setValueAtTime(0.0001, t);
+
+                g.gain.linearRampToValueAtTime(
+                    peak,
+                    t + Math.min(0.025, dur * 0.15)
+                );
+
+                // Smooth decay
+                g.gain.exponentialRampToValueAtTime(
+                    0.0001,
+                    t + dur
+                );
+
+                o.connect(g);
+                g.connect(MASTER || a.destination);
+
+                o.start(t);
+                o.stop(t + dur + 0.03);
+
+            } catch (e) {}
+        }
+
+
+        const SFX = {
+
+            // Soft, warm heartbeat: "lub" (strong) then "dub" (softer).
+            // Kept in the 100-250 Hz range so it is clearly audible on phone speakers.
+            thump(strong) {
+                const s = (strong === false) ? 0.7 : 1;
+
+                // warm body of the beat
+                tone(130, 55, 0.32, 0.85 * s, 'sine');
+
+                // mid layer so small phone speakers can reproduce it
+                tone(250, 120, 0.18, 0.3 * s, 'sine', 0.004);
+
+                // very soft "thud" texture
+                tone(180, 80, 0.12, 0.12 * s, 'triangle', 0.002);
+            },
+
+            orb() {
+                tone(
+                    520,
+                    780,
+                    0.5,
+                    0.04
+                );
+
+                tone(
+                    260,
+                    390,
+                    0.6,
+                    0.03,
+                    'sine',
+                    0.05
+                );
+            },
+
+            click() {
+                tone(
+                    1400,
+                    700,
+                    0.04,
+                    0.04,
+                    'triangle'
+                );
+
+                tone(
+                    2100,
+                    1500,
+                    0.03,
+                    0.025,
+                    'sine',
+                    0.04
+                );
+            },
+
+            confirm() {
+                tone(
+                    660,
+                    660,
+                    0.25,
+                    0.05
+                );
+
+                tone(
+                    880,
+                    880,
+                    0.4,
+                    0.05,
+                    'sine',
+                    0.12
+                );
+
+                tone(
+                    1320,
+                    1320,
+                    0.5,
+                    0.035,
+                    'sine',
+                    0.26
+                );
+            },
+
+            reveal() {
+                tone(
+                    523,
+                    523,
+                    0.9,
+                    0.04
+                );
+
+                tone(
+                    784,
+                    784,
+                    1.2,
+                    0.035,
+                    'sine',
+                    0.12
+                );
+
+                tone(
+                    1046,
+                    1046,
+                    1.5,
+                    0.025,
+                    'sine',
+                    0.24
+                );
+            }
+        };
+
+
+        function vibe(p) {
+            try {
+                if (
+                    'vibrate' in navigator &&
+                    typeof navigator.vibrate === 'function' &&
+                    (
+                        !navigator.userActivation ||
+                        navigator.userActivation.hasBeenActive
+                    )
+                ) {
+                    navigator.vibrate(p);
+                }
+            } catch (e) {}
+        }
         const HEARTBEATS = [0, 280, 560, 840];
         let heartbeatSilent = false;
 
@@ -1309,11 +1365,13 @@ function vibe(p) {
         }
 
         function playHeartbeat() {
+            unlockAudio();
             const a = getAudio();
             heartbeatSilent = !(a && a.state === 'running');
             HEARTBEATS.forEach((d, i) => setTimeout(() => {
                 pulseOrb();
-                SFX.thump();
+                // even index = "lub" (strong), odd index = "dub" (softer)
+                withAudio(() => SFX.thump(i % 2 === 0));
                 vibe(i === HEARTBEATS.length - 1 ? [24, 40, 18] : 12);
             }, d * (RM ? 0.5 : 1)));
         }
@@ -1355,14 +1413,17 @@ function vibe(p) {
             setOrigin();
             window.addEventListener('resize', setOrigin);
 
+            // Keep listening until the audio engine is really running
+            // (on mobile, only touchend / click count as a valid user gesture)
             const gestures = ['pointerdown', 'pointerup', 'touchstart', 'touchend', 'click', 'keydown', 'wheel'];
             const onGesture = () => {
-                gestures.forEach(ev => window.removeEventListener(ev, onGesture));
-                const a = getAudio();
-                if (!a) return;
-                try {
-                    a.resume().catch(() => {});
-                } catch (e) {}
+                unlockAudio();
+                setTimeout(() => {
+                    const a = getAudio();
+                    if (a && a.state === 'running') {
+                        gestures.forEach(ev => window.removeEventListener(ev, onGesture));
+                    }
+                }, 350);
             };
             gestures.forEach(ev => window.addEventListener(ev, onGesture, { passive: true }));
 
@@ -1400,6 +1461,7 @@ function vibe(p) {
                 orb.setAttribute('aria-disabled', 'true');
                 let started = false;
                 const go = () => { if (started) return; started = true; playHeartbeat(); revealSignal(1700); };
+                unlockAudio();
                 const a = getAudio();
                 if (!a) { go(); return; }
                 try { a.resume().then(go).catch(go); } catch (e) { go(); }
@@ -1416,6 +1478,7 @@ function vibe(p) {
             const sub = byId('mysterySub');
             if (sub) sub.classList.remove('show');
 
+            unlockAudio();
             intro.classList.add('engaged');
             pulseOrb();
             withAudio(() => SFX.orb());
