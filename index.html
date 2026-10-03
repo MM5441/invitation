@@ -1085,49 +1085,216 @@
         const RM = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
         let AC = null;
 
-        function getAudio() {
-            if (AC) return AC;
-            const Ctor = window.AudioContext || window.webkitAudioContext;
-            if (!Ctor) return null;
-            try { AC = new Ctor(); } catch (e) { AC = null; }
-            return AC;
-        }
-        function withAudio(fn) {
-            const a = getAudio();
-            if (!a) return;
-            if (a.state === 'running') { fn(); return; }
-            try { a.resume().then(() => { if (a.state === 'running') fn(); }).catch(() => {}); } catch (e) {}
-        }
-        function tone(f0, f1, dur, peak, type, delay) {
-            const a = AC;
-            if (!a || a.state !== 'running') return;
-            try {
-                const t = a.currentTime + (delay || 0) + 0.01;
-                const o = a.createOscillator(), g = a.createGain();
-                o.type = type || 'sine';
-                o.frequency.setValueAtTime(f0, t);
-                o.frequency.exponentialRampToValueAtTime(Math.max(f1, 1), t + dur);
-                g.gain.setValueAtTime(0.0001, t);
-                g.gain.exponentialRampToValueAtTime(peak, t + Math.min(0.015, dur / 3));
-                g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
-                o.connect(g); g.connect(a.destination);
-                o.start(t); o.stop(t + dur + 0.03);
-            } catch (e) {}
-        }
-        const SFX = {
-            thump() { tone(95, 42, 0.2, 0.35); tone(190, 80, 0.12, 0.09, 'triangle'); },
-            orb() { tone(520, 780, 0.5, 0.04); tone(260, 390, 0.6, 0.03, 'sine', 0.05); },
-            click() { tone(1400, 700, 0.04, 0.04, 'triangle'); tone(2100, 1500, 0.03, 0.025, 'sine', 0.04); },
-            confirm() { tone(660, 660, 0.25, 0.05); tone(880, 880, 0.4, 0.05, 'sine', 0.12); tone(1320, 1320, 0.5, 0.035, 'sine', 0.26); },
-            reveal() { tone(523, 523, 0.9, 0.04); tone(784, 784, 1.2, 0.035, 'sine', 0.12); tone(1046, 1046, 1.5, 0.025, 'sine', 0.24); }
-        };
-        function vibe(p) {
-            try {
-                if ('vibrate' in navigator && typeof navigator.vibrate === 'function' &&
-                    (!navigator.userActivation || navigator.userActivation.hasBeenActive)) navigator.vibrate(p);
-            } catch (e) {}
-        }
+      function getAudio() {
+    if (AC) return AC;
 
+    const Ctor = window.AudioContext || window.webkitAudioContext;
+    if (!Ctor) return null;
+
+    try {
+        AC = new Ctor();
+    } catch (e) {
+        AC = null;
+    }
+
+    return AC;
+}
+
+function withAudio(fn) {
+    const a = getAudio();
+    if (!a) return;
+
+    if (a.state === 'running') {
+        fn();
+        return;
+    }
+
+    try {
+        a.resume()
+            .then(() => {
+                if (a.state === 'running') {
+                    fn();
+                }
+            })
+            .catch(() => {});
+    } catch (e) {}
+}
+
+function tone(f0, f1, dur, peak, type, delay) {
+    const a = AC;
+
+    if (!a || a.state !== 'running') return;
+
+    try {
+        const t = a.currentTime + (delay || 0) + 0.01;
+
+        const o = a.createOscillator();
+        const g = a.createGain();
+
+        o.type = type || 'sine';
+
+        // Frequency sweep
+        o.frequency.setValueAtTime(f0, t);
+        o.frequency.exponentialRampToValueAtTime(
+            Math.max(f1, 1),
+            t + dur
+        );
+
+        // Smooth attack
+        g.gain.setValueAtTime(0.0001, t);
+
+        g.gain.linearRampToValueAtTime(
+            peak,
+            t + Math.min(0.025, dur * 0.15)
+        );
+
+        // Smooth decay
+        g.gain.exponentialRampToValueAtTime(
+            0.0001,
+            t + dur
+        );
+
+        o.connect(g);
+        g.connect(a.destination);
+
+        o.start(t);
+        o.stop(t + dur + 0.03);
+
+    } catch (e) {}
+}
+
+
+const SFX = {
+
+    // Soft realistic heartbeat
+    thump() {
+        // Main deep body
+        tone(
+            75,
+            38,
+            0.24,
+            0.22,
+            'sine'
+        );
+
+        // Very subtle upper layer
+        tone(
+            145,
+            65,
+            0.13,
+            0.045,
+            'sine',
+            0.005
+        );
+    },
+
+    orb() {
+        tone(
+            520,
+            780,
+            0.5,
+            0.04
+        );
+
+        tone(
+            260,
+            390,
+            0.6,
+            0.03,
+            'sine',
+            0.05
+        );
+    },
+
+    click() {
+        tone(
+            1400,
+            700,
+            0.04,
+            0.04,
+            'triangle'
+        );
+
+        tone(
+            2100,
+            1500,
+            0.03,
+            0.025,
+            'sine',
+            0.04
+        );
+    },
+
+    confirm() {
+        tone(
+            660,
+            660,
+            0.25,
+            0.05
+        );
+
+        tone(
+            880,
+            880,
+            0.4,
+            0.05,
+            'sine',
+            0.12
+        );
+
+        tone(
+            1320,
+            1320,
+            0.5,
+            0.035,
+            'sine',
+            0.26
+        );
+    },
+
+    reveal() {
+        tone(
+            523,
+            523,
+            0.9,
+            0.04
+        );
+
+        tone(
+            784,
+            784,
+            1.2,
+            0.035,
+            'sine',
+            0.12
+        );
+
+        tone(
+            1046,
+            1046,
+            1.5,
+            0.025,
+            'sine',
+            0.24
+        );
+    }
+};
+
+
+function vibe(p) {
+    try {
+        if (
+            'vibrate' in navigator &&
+            typeof navigator.vibrate === 'function' &&
+            (
+                !navigator.userActivation ||
+                navigator.userActivation.hasBeenActive
+            )
+        ) {
+            navigator.vibrate(p);
+        }
+    } catch (e) {}
+}
         const HEARTBEATS = [0, 280, 560, 840];
         let heartbeatSilent = false;
 
