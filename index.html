@@ -1166,27 +1166,27 @@ function tone(f0, f1, dur, peak, type, delay) {
 
 const SFX = {
 
-    // Soft realistic heartbeat
-    thump() {
-        // Main deep body
-        tone(
-            75,
-            38,
-            0.24,
-            0.22,
-            'sine'
-        );
+   thump() {
+    // Main heartbeat body
+    tone(
+        75,
+        38,
+        0.24,
+        0.38,
+        'sine'
+    );
 
-        // Very subtle upper layer
-        tone(
-            145,
-            65,
-            0.13,
-            0.045,
-            'sine',
-            0.005
-        );
-    },
+    // Upper layer so the heartbeat remains audible
+    // on small phone speakers
+    tone(
+        145,
+        65,
+        0.13,
+        0.075,
+        'sine',
+        0.005
+    );
+},
 
     orb() {
         tone(
