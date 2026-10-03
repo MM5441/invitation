@@ -62,7 +62,6 @@
             outline-offset: 4px;
         }
 
-        /* ==================== Ambient background ==================== */
 
         .ambient {
             position: fixed; inset: 0; z-index: 1; pointer-events: none; overflow: hidden;
@@ -231,7 +230,6 @@
         }
         .mystery-intro.burst .mystery-flash { clip-path: circle(160vmax at var(--ox, 50%) var(--oy, 50%)); }
 
-        /* seal wakes up once the intro hands over to page 1 */
         .seal-button.seal-awaken .seal-ring { animation: sealAwaken 2.4s ease-out 1; }
         @keyframes sealAwaken {
             0% { filter: drop-shadow(0 0 44px rgba(240,221,176,0.95)); transform: scale(1.14); }
@@ -431,7 +429,6 @@
 
         .attempts-counter { text-align: center; color: var(--text-faint); font-size: 0.85rem; }
 
-        /* ==================== Page 4 — بطاقات ==================== */
 
         .page-cards { background: linear-gradient(160deg, var(--ink-950) 0%, #211a2c 50%, var(--ink-950) 100%); }
 
@@ -635,7 +632,6 @@
         .fade-in-btn { opacity: 0; visibility: hidden; transition: opacity 0.5s var(--ease), visibility 0.5s var(--ease); }
         .fade-in-btn.show { opacity: 1; visibility: visible; }
 
-        /* ==================== Feedback modal (name game only) ==================== */
 
         .overlay {
             position: fixed; inset: 0; background: rgba(4, 3, 7, 0.72);
@@ -1516,7 +1512,6 @@
             }, 750);
         }
 
-        /* ---------- response modal ---------- */
         function showResponse(message, type) {
             const box = document.getElementById('responseMessage');
             const icon = document.getElementById('responseIcon');
