@@ -9,11 +9,9 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Tajawal:wght@300;400;500;700&display=swap" rel="stylesheet">
     <style>
-        /* ==================== Reset & Tokens ==================== */
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
         :root {
-            /* Color system — deep ink, antique gold, wine, parchment */
             --ink-950: #07060b;
             --ink-900: #0f0c17;
             --ink-800: #1a1522;
@@ -102,8 +100,6 @@
             50% { transform: translate(10px, -34px); opacity: 0.7; }
         }
 
-        /* ==================== Progress ==================== */
-
         .progress-dots {
             position: fixed;
             top: max(1.3rem, env(safe-area-inset-top));
@@ -176,7 +172,6 @@
             width: clamp(120px, 30vmin, 200px);
             height: clamp(120px, 30vmin, 200px);
         }
-        /* faint sigil — same geometry as the wax seal on page 1 */
         .mystery-sigil { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; opacity: 0; transition: opacity 1.6s ease; pointer-events: none; }
         .mystery-intro.ready .mystery-sigil { opacity: 0.55; }
         .mystery-intro.burst .mystery-sigil { opacity: 0; }
@@ -228,7 +223,6 @@
         .mystery-sub.show { opacity: 1; }
         @media (max-width: 480px) { .mystery-text { letter-spacing: 0.16em; } }
 
-        /* light expansion from the orb */
         .mystery-flash {
             position: absolute; inset: 0; z-index: 5; pointer-events: none;
             background: radial-gradient(circle at var(--ox, 50%) var(--oy, 50%), #fff8e6 0%, #f0ddb0 18%, rgba(207,169,104,0.92) 42%, rgba(109,44,61,0.55) 78%, rgba(7,6,11,0) 100%);
@@ -244,7 +238,6 @@
             100% { filter: drop-shadow(0 0 6px rgba(207,169,104,0.35)); transform: scale(1); }
         }
 
-        /* ==================== Mystery stages (secret file / last piece) ==================== */
         .stage {
             position: fixed; inset: 0; z-index: 30; overflow-y: auto; -webkit-overflow-scrolling: touch;
             display: flex; align-items: center; justify-content: center;
@@ -273,7 +266,6 @@
         .piece-hint { font-size: 0.88rem; color: var(--text-faint); line-height: 1.8; }
         .file-status.granted { color: var(--gold-light); letter-spacing: 0.34em; text-shadow: 0 0 14px rgba(240,221,176,0.6); }
 
-        /* hidden clue glyphs scattered through the journey */
         .clue { position: absolute; z-index: 6; width: 44px; height: 44px; display: grid; place-items: center; border: 0; background: none; color: var(--gold); font-size: 1.15rem; opacity: 0.26; cursor: pointer; touch-action: manipulation; transition: opacity 0.4s ease, transform 0.4s ease, text-shadow 0.4s ease; }
         .clue:hover, .clue:focus-visible { opacity: 0.7; }
         .clue.got { opacity: 0.9; transform: scale(1.25); text-shadow: 0 0 12px var(--gold-light); pointer-events: none; }
@@ -282,8 +274,6 @@
         .page-finale.active .finale-title { animation: finaleIn 1.6s var(--ease) both; }
         .page-finale.active .finale-text { animation: rise 1.2s var(--ease) 0.9s both; }
         @keyframes finaleIn { from { opacity: 0; filter: blur(10px); transform: scale(0.96); } to { opacity: 1; filter: blur(0); transform: scale(1); } }
-
-        /* ==================== Layout scaffolding ==================== */
 
         .container { width: 100%; height: calc(var(--vh, 1vh) * 100); position: relative; z-index: 10; }
 
@@ -309,7 +299,6 @@
         }
         @keyframes rise { from { opacity: 0; transform: translateY(28px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* Ornamental divider used under every page eyebrow */
         .ornament {
             display: flex; align-items: center; gap: 0.7rem;
             width: 100%; max-width: 220px;
@@ -334,7 +323,6 @@
             text-align: center;
         }
 
-        /* Corner-bracket frame, evokes a printed invitation card */
         .bracketed { position: relative; }
         .bracketed::before, .bracketed::after {
             content: ''; position: absolute; width: 22px; height: 22px;
@@ -343,7 +331,6 @@
         .bracketed::before { top: -1px; right: -1px; border-top: 1.5px solid var(--gold-dim); border-right: 1.5px solid var(--gold-dim); }
         .bracketed::after { bottom: -1px; left: -1px; border-bottom: 1.5px solid var(--gold-dim); border-left: 1.5px solid var(--gold-dim); }
 
-        /* ==================== Page 1 — الدعوة ==================== */
 
         .page-invite { background: radial-gradient(ellipse at 50% 30%, #171020 0%, var(--ink-950) 70%); }
 
@@ -388,7 +375,6 @@
             text-align: center;
         }
 
-        /* ==================== Page 2 — الرسالة ==================== */
 
         .page-letter { background: linear-gradient(160deg, var(--ink-950) 0%, #1c1420 55%, var(--ink-950) 100%); }
 
@@ -419,7 +405,6 @@
         .cursor-blink { display: inline-block; width: 2px; background: var(--wine); margin-inline-start: 2px; animation: blink 0.9s step-end infinite; }
         @keyframes blink { 50% { opacity: 0; } }
 
-        /* ==================== Page 3 — من أنا ==================== */
 
         .page-guess { background: linear-gradient(165deg, var(--ink-950) 0%, #201828 50%, var(--ink-950) 100%); }
 
@@ -485,7 +470,6 @@
             border: 1px solid var(--gold-dim);
         }
 
-        /* ==================== Page 5 — مزاج اليوم ==================== */
 
         .page-mood { background: linear-gradient(160deg, var(--ink-950) 0%, #241a22 55%, var(--ink-950) 100%); }
 
@@ -516,7 +500,6 @@
         }
         .reveal-panel.show { display: block; }
 
-        /* ==================== Page 6 — الهدية ==================== */
 
         .page-gift { background: linear-gradient(160deg, var(--ink-950) 0%, #2a1c1f 55%, var(--ink-950) 100%); }
 
@@ -538,7 +521,6 @@
         .gift-card-icon { font-size: 1.9rem; }
         .gift-card-label { font-size: 0.82rem; color: var(--parchment); font-weight: 500; }
 
-        /* ==================== Page 7 — كبسولة أمنية ==================== */
 
         .page-wish { background: linear-gradient(160deg, var(--ink-950) 0%, #1e1a2c 55%, var(--ink-950) 100%); }
 
@@ -565,7 +547,6 @@
         .wish-textarea:focus { outline: none; background: rgba(207, 169, 104, 0.13); border-color: var(--gold-light); }
         .wish-textarea:disabled { opacity: 0.55; }
 
-        /* Wax seal that stamps down over the capsule */
         .wish-seal-overlay {
             position: absolute; inset: 0;
             display: flex; align-items: center; justify-content: center;
@@ -596,7 +577,6 @@
         }
         .wish-response.show { display: block; }
 
-        /* ==================== Page 8 — الختام ==================== */
 
         .page-finale { background: radial-gradient(ellipse at 50% 20%, #241a30 0%, var(--ink-950) 65%); }
         .page-reflection { background: linear-gradient(160deg, var(--ink-950) 0%, #211827 55%, var(--ink-950) 100%); }
@@ -618,7 +598,6 @@
             line-height: 2; font-size: 1.02rem;
         }
 
-        /* ==================== Buttons ==================== */
 
         .btn {
             padding: 0.95rem 1.9rem; font-size: 0.96rem;
@@ -697,12 +676,10 @@
         }
         .response-close:hover { background: rgba(109, 44, 61, 0.1); }
 
-        /* ==================== Confetti ==================== */
 
         .confetti-container { position: fixed; inset: 0; z-index: 98; pointer-events: none; }
         .confetti { position: absolute; width: 8px; height: 8px; pointer-events: none; }
 
-        /* ==================== Responsive ==================== */
 
         @media (max-width: 768px) {
             .frame { gap: 1.7rem; }
@@ -737,7 +714,6 @@
             .letter-content { min-height: 150px; }
         }
 
-        /* ==================== Page 11 — الكيك ==================== */
         .page-cake { background: radial-gradient(ellipse at 50% 25%, #2a1c25 0%, var(--ink-950) 68%); }
         .cake-frame {
             width: min(100%, 420px); padding: 10px;
@@ -830,7 +806,6 @@
 
     <div class="container">
 
-        <!-- Page 1 — الدعوة -->
         <div class="page page-invite active">
             <div class="frame">
                 <div class="eyebrow">دعوة خاصة</div>
@@ -864,7 +839,6 @@
             </div>
         </div>
 
-        <!-- Page 2 — الرسالة -->
         <div class="page page-letter">
             <div class="frame">
                 <div class="letter-card bracketed">
@@ -877,7 +851,6 @@
             </div>
         </div>
 
-        <!-- Page 3 — إنسان -->
         <div class="page page-guess page-human">
             <div class="frame">
                 <div class="eyebrow">تلميح صغير</div>
@@ -900,7 +873,6 @@
             </div>
         </div>
 
-        <!-- Page 4 — بطاقات -->
         <div class="page page-cards">
             <div class="frame">
                 <div>
@@ -916,7 +888,6 @@
             </div>
         </div>
 
-        <!-- Page 5 — مزاج اليوم -->
         <div class="page page-mood">
             <div class="frame">
                 <div>
@@ -934,7 +905,6 @@
             </div>
         </div>
 
-        <!-- Page 6 — الهدية -->
         <div class="page page-gift">
             <div class="frame">
                 <div>
@@ -952,7 +922,6 @@
             </div>
         </div>
 
-        <!-- Page 7 — كبسولة أمنية -->
         <div class="page page-wish">
             <div class="frame">
                 <div>
@@ -997,7 +966,6 @@
             </div>
         </div>
 
-        <!-- Page 8 — أثر جميل -->
         <div class="page page-reflection">
             <div class="frame">
                 <div class="ornament"><span></span></div>
@@ -1017,7 +985,6 @@
             </div>
         </div>
 
-        <!-- Page 9 — تذكار -->
         <div class="page page-keepsake">
             <div class="frame">
                 <div>
@@ -1038,7 +1005,6 @@
             </div>
         </div>
 
-        <!-- Page 10 — الختام -->
         <div class="page page-finale">
             <div class="frame">
                 <div class="ornament"><span></span></div>
@@ -1061,13 +1027,11 @@
             </div>
         </div>
 
-        <!-- Page 11 — الكيك -->
         <div class="page page-cake">
             <div class="frame">
                 <div class="ornament"><span></span></div>
 
                 <div class="cake-frame bracketed">
-                    <!-- ⭐ غيّري cake.jpg لاسم صورتك (أو حطي data:image/jpeg;base64,... إذا بدك الصورة داخل الملف) -->
                 <img src="image.png" alt="قالب كيك الك" loading="lazy">
 
                 </div>
@@ -1084,7 +1048,6 @@
 
     </div>
 
-    <!-- Secret file stage (sits between page 2 and page 3) -->
     <section class="stage" id="stageFile" inert aria-label="Secret file">
         <div class="stage-frame">
             <div class="file-tag">FILE // 017</div>
@@ -1097,7 +1060,6 @@
         </div>
     </section>
 
-    <!-- Last piece stage (sits between page 9 and page 10) -->
     <section class="stage" id="stagePiece" inert aria-label="The last piece">
         <div class="stage-frame">
             <div class="file-tag">THE LAST PIECE</div>
@@ -1118,13 +1080,11 @@
     <div class="confetti-container" id="confettiContainer"></div>
 
     <script>
-        /* ---------- viewport height fix ---------- */
         function setVH() { document.documentElement.style.setProperty('--vh', (window.innerHeight * 0.01) + 'px'); }
         setVH();
         window.addEventListener('resize', setVH);
         window.addEventListener('orientationchange', setVH);
 
-        /* ---------- mystery layer: helpers ---------- */
         const byId = (id) => document.getElementById(id);
         const RM = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
         let AC = null;
@@ -1136,7 +1096,6 @@
             try { AC = new Ctor(); } catch (e) { AC = null; }
             return AC;
         }
-        /* run fn once audio is running; only call from a user gesture */
         function withAudio(fn) {
             const a = getAudio();
             if (!a) return;
@@ -1173,7 +1132,6 @@
             } catch (e) {}
         }
 
-        /* ---------- mystery intro ---------- */
         const HEARTBEATS = [0, 280, 560, 840];
         let heartbeatSilent = false;
 
@@ -1234,7 +1192,6 @@
             setOrigin();
             window.addEventListener('resize', setOrigin);
 
-            /* first user gesture: unlock audio, replay heartbeat if autoplay was blocked */
             const gestures = ['pointerdown', 'pointerup', 'touchstart', 'touchend', 'click', 'keydown', 'wheel'];
             const onGesture = () => {
                 gestures.forEach(ev => window.removeEventListener(ev, onGesture));
@@ -1265,7 +1222,6 @@
                 setTimeout(() => setMysteryText('UNKNOWN FILE'), 450 * k);
                 revealSignal(1900);
             } else {
-                /* audio blocked: the dot keeps breathing quietly until she touches it */
                 intro.classList.add('waiting');
                 orb.removeAttribute('aria-disabled');
                 setTimeout(() => setMysteryText('UNKNOWN FILE'), 450 * k);
@@ -1317,7 +1273,6 @@
             if (intro) intro.classList.add('hidden');
             setTimeout(() => { if (dots) dots.classList.add('visible'); }, 500);
 
-            /* replay page 1 entrance and wake the seal */
             const frame = document.querySelector('.page-invite .frame');
             if (frame) { frame.style.animation = 'none'; void frame.offsetWidth; frame.style.animation = ''; }
             const seal = byId('sealButton');
@@ -1331,10 +1286,8 @@
 
         initMysteryIntro();
 
-        /* ---------- editable content ---------- */
 
         const CORRECT_NAMES = ['فؤاد', 'fouad', 'Fouad'
-            // ⭐ ضيفي أي شكل تاني للاسم الصحيح هون
         ];
 
         const LETTER_TEXT =
@@ -1387,11 +1340,9 @@
             { icon: '🤗', label: 'سعادة', response: 'وجودك بأي مكان بيعطي سعادة ' }
         ];
 
-        /* ---------- state ---------- */
         let state = { attempts: 3, isProcessing: false, typingTimeout: null, flipped: new Set() };
         let responseCloseTimer = null;
 
-        /* ---------- navigation ---------- */
         function updateProgressDots(n) {
             document.querySelectorAll('.progress-dot').forEach(dot => {
                 const dp = parseInt(dot.dataset.page);
@@ -1418,7 +1369,6 @@
             setTimeout(() => goToPage(2), 550);
         }
 
-        /* ---------- letter typing ---------- */
         function typeLetter() {
             const el = document.getElementById('letterText');
             el.textContent = '';
@@ -1439,7 +1389,6 @@
             step();
         }
 
-        /* ---------- name game ---------- */
         function checkName() {
             if (state.isProcessing) return;
             const input = document.getElementById('nameInput');
@@ -1475,7 +1424,6 @@
 
         function handleKeyPress(e) { if (e.key === 'Enter') { e.preventDefault(); checkName(); } }
 
-        /* ---------- flip cards ---------- */
         function buildFlipCards() {
             const grid = document.getElementById('flipGrid');
             grid.innerHTML = '';
@@ -1498,7 +1446,6 @@
             });
         }
 
-        /* ---------- mood ---------- */
         function buildMoodOptions() {
             const grid = document.getElementById('moodGrid');
             grid.innerHTML = '';
@@ -1518,7 +1465,6 @@
             });
         }
 
-        /* ---------- gift ---------- */
         function buildGiftCards() {
             const grid = document.getElementById('giftGrid');
             grid.innerHTML = '';
@@ -1538,7 +1484,6 @@
             });
         }
 
-        /* ---------- wish capsule ---------- */
         const WISH_FORM_ENDPOINT = 'https://formspree.io/f/xdenzvbo';
 
         function sealWish() {
@@ -1596,7 +1541,6 @@
             clearTimeout(responseCloseTimer);
         }
 
-        /* ---------- confetti ---------- */
         function createConfetti() {
             const colors = ['#cfa968', '#f0ddb0', '#9c4a5c', '#c98a86'];
             const container = document.getElementById('confettiContainer');
@@ -1624,7 +1568,6 @@
         dynStyle.textContent = `@keyframes confettiFall { to { transform: translateY(100vh) translateX(var(--drift, 0px)) rotate(220deg); opacity: 0; } }`;
         document.head.appendChild(dynStyle);
 
-        /* ---------- restart ---------- */
         function restartJourney() {
             state = { attempts: 3, isProcessing: false, typingTimeout: null, flipped: new Set() };
             clearTimeout(state.typingTimeout);
@@ -1664,11 +1607,9 @@
             goToPage(1);
         }
 
-        /* ---------- mystery stages: secret file, clues, last piece ---------- */
         const MY = { clues: new Set(), fileDone: false, lastDone: false, timer: null };
         const PIECE_SYMBOLS = ['◈', '☾', '✧', '❖'];
 
-        /* ⭐ edit freely: null = redacted field */
         const SECRET_FILE_ROWS = [
             ['SUBJECT', null],
             ['OBSERVATION 01', FLIP_CARDS[2]],
@@ -1678,7 +1619,6 @@
             ['NOTE', 'ناقص عمدًا... والباقي بآخر الرحلة']
         ];
 
-        /* page index is 0-based over .page elements */
         const CLUE_SPOTS = [
             { page: 2, css: 'bottom:9%;left:7%' },
             { page: 4, css: 'top:15%;right:6%' },
@@ -1790,7 +1730,6 @@
 
         function finaleReveal() { withAudio(() => SFX.reveal()); }
 
-        /* wrap navigation: stages sit inside the existing 10-page journey, numbering unchanged */
         const __goToPage = goToPage;
         goToPage = function (n) {
             if (n === 3 && !MY.fileDone) { openStage('stageFile'); return; }
@@ -1818,7 +1757,6 @@
         byId('fileOpenBtn').addEventListener('click', openSecretFile);
         byId('fileContinueBtn').addEventListener('click', () => { MY.fileDone = true; goToPage(3); });
 
-        /* ---------- init ---------- */
         buildFlipCards();
         buildMoodOptions();
         buildGiftCards();
