@@ -1576,25 +1576,6 @@ function leavePhoto() {
             setTimeout(finishMystery, 2500 * k);
         }
 
-        function finishMystery() {
-            const intro = byId('mysteryIntro');
-            const dots = byId('progressDots');
-            const container = document.querySelector('.container');
-            if (container) container.inert = false;
-            if (intro) intro.classList.add('hidden');
-            setTimeout(() => { if (dots) dots.classList.add('visible'); }, 500);
-
-            const frame = document.querySelector('.page-invite .frame');
-            if (frame) { frame.style.animation = 'none'; void frame.offsetWidth; frame.style.animation = ''; }
-            const seal = byId('sealButton');
-            if (seal) {
-                seal.classList.add('seal-awaken');
-                setTimeout(() => seal.classList.remove('seal-awaken'), 2600);
-                try { seal.focus({ preventScroll: true }); } catch (e) {}
-            }
-            setTimeout(() => { if (intro && intro.parentNode) intro.parentNode.removeChild(intro); }, 1300);
-        }
-
         initMysteryIntro();
 
 
