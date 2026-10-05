@@ -1231,18 +1231,38 @@
 
             // Soft, warm heartbeat: "lub" (strong) then "dub" (softer).
             // Kept in the 100-250 Hz range so it is clearly audible on phone speakers.
-            thump(strong) {
-                const s = (strong === false) ? 0.7 : 1;
+      thump(strong) {
+    const s = (strong === false) ? 0.72 : 1;
 
-                // warm body of the beat
-                tone(130, 55, 0.32, 0.85 * s, 'sine');
+    // Deep body — يعطي إحساس "دُم"
+    tone(
+        115,
+        55,
+        0.28,
+        0.72 * s,
+        'sine'
+    );
 
-                // mid layer so small phone speakers can reproduce it
-                tone(250, 120, 0.18, 0.3 * s, 'sine', 0.004);
+    // Mid body — الجزء الأهم لسماعات الهاتف
+    tone(
+        240,
+        105,
+        0.16,
+        0.38 * s,
+        'triangle',
+        0.003
+    );
 
-                // very soft "thud" texture
-                tone(180, 80, 0.12, 0.12 * s, 'triangle', 0.002);
-            },
+    // Short attack — يجعل بداية النبضة مسموعة بوضوح
+    tone(
+        330,
+        150,
+        0.075,
+        0.16 * s,
+        'triangle',
+        0.006
+    );
+},
 
             orb() {
                 tone(
